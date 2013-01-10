@@ -9,7 +9,7 @@ object Runner {
     args match {
       case Nil => map // true if everything processed successfully
       case "-m" :: (x: String) :: rest => processParams(rest, map + ("sheetName" -> x))
-      case "-p" :: (x: String) :: rest => processParams(rest, map + ("projectName" -> x))
+      case "-p" :: (x: String) :: rest => processParams(rest, map + ("projectNames" -> x))
       case x => throw new RuntimeException(s"Unrecognized option: $x (${args.mkString(" ")})")
     }
   }
@@ -18,23 +18,32 @@ object Runner {
 
     val map = processParams(args.toList, Map())
 
-    val sheetName = map.getOrElse("sheetName", "Undefined sheetName, use -m sheetName (e.g. -m 01)")
-    val projectName = map.getOrElse("projectName", "Undefined projectName, use -p projectName")
+    val sheetName = map.getOrElse("sheetName", 
+        throw new Error("Undefined sheetName, use -m sheetName (e.g. -m 01)"))
+    val projectNames = map.getOrElse("projectNames", 
+        throw new Error("Undefined projectName, use -p projectName1[,projectName2]")).split(",")
 
     val outputFile = s"${Props.outputDir}/TB-${Props.year}-$sheetName-${Props.surname}.xls"
     val month = DateTime.parse(s"${Props.year}-$sheetName-01")
 
-    doMain(sheetName, projectName, outputFile, month)
+    doMain(sheetName, projectNames, outputFile, month)
   }
 
-  def doMain(sheetName: String, projectName: String, outputFile: String, month: DateTime) {
+  def doMain(sheetName: String, projectNames: Array[String], outputFile: String, month: DateTime) {
 
     val vykaz = new Vykaz(Props.sourceFile, sheetName)
-    val recs = vykaz.readProject(projectName)
-    recs foreach println
+    
+    val records = for {
+      projectName <- projectNames
+    } yield {
+    	val recs = vykaz.readProject(projectName)
+    	recs foreach println
+      (projectName, recs)
+    }
 
+    
     val timesheet = new Tatigkeitsbericht(outputFile)
-    timesheet.writeProject(month, projectName, recs)
+    timesheet.writeProject(month, records)
 
   }
 }

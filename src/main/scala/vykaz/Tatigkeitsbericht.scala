@@ -14,36 +14,53 @@ import org.apache.poi.ss.util.RegionUtil
 import Implicits._
 import org.joda.time.DateTime
 import org.apache.poi.hssf.util.HSSFColor
+import scala.collection.Seq
 
 class Tatigkeitsbericht(xls: String) {
 
-   println(s"TB: $xls")
-  
+  type HourTuple = (String, Double)
+  type ProjectTuple = (String, Seq[HourTuple])
+  type ProjectLineTuple = (Int, String, Seq[HourTuple])
+
+  println(s"TB: $xls")
+
   val label = "Tätigkeitsbericht"
 
   // create a new workbook
   val wb: Workbook = new HSSFWorkbook
 
-  lazy val arial10 = wb.createFont
-  arial10.setFontHeightInPoints(10)
-  arial10.setFontName("Arial")
+  lazy val arial10 = {
+    val f = wb.createFont
+    f.setFontHeightInPoints(10)
+    f.setFontName("Arial")
+    f
+  }
 
-  lazy val arial10b = wb.createFont
-  arial10b.setFontHeightInPoints(10)
-  arial10b.setFontName("Arial")
-  arial10b.setBoldweight(Font.BOLDWEIGHT_BOLD)
+  lazy val arial10b = {
+    val f = wb.createFont
+    f.setFontHeightInPoints(10)
+    f.setFontName("Arial")
+    f.setBoldweight(Font.BOLDWEIGHT_BOLD)
+    f
+  }
 
-  lazy val arial12b = wb.createFont
-  arial12b.setFontHeightInPoints(12)
-  arial12b.setFontName("Arial")
-  arial12b.setBoldweight(Font.BOLDWEIGHT_BOLD)
+  lazy val arial12b = {
+    val f = wb.createFont
+    f.setFontHeightInPoints(12)
+    f.setFontName("Arial")
+    f.setBoldweight(Font.BOLDWEIGHT_BOLD)
+    f
+  }
 
-  val arial14b = wb.createFont
-  arial14b.setFontHeightInPoints(14)
-  arial14b.setFontName("Arial")
-  arial14b.setBoldweight(Font.BOLDWEIGHT_BOLD)
+  val arial14b = {
+    val f = wb.createFont
+    f.setFontHeightInPoints(14)
+    f.setFontName("Arial")
+    f.setBoldweight(Font.BOLDWEIGHT_BOLD)
+    f
+  }
 
-  def writeProject(date: DateTime, projectName: String, recs: Seq[(String, Double)]) = {
+  def writeProject(date: DateTime, records: Seq[ProjectTuple]) = {
 
     // create a new sheet
     val sheet = wb.createSheet(label);
@@ -58,7 +75,7 @@ class Tatigkeitsbericht(xls: String) {
     //	}
 
     prepare(Props.fullName, date)(sheet)
-    insData(projectName, recs)(sheet)
+    insData(records)(sheet)
 
     //    val comments = collectComments(sheet)(prjName)
 
@@ -79,18 +96,47 @@ class Tatigkeitsbericht(xls: String) {
     out.close
   }
 
-  def insData(projectName: String, recs: Seq[(String, Double)])(implicit sheet: Sheet) {
-    cell(5, 0).cellValue(projectName).cellFont(arial10b)
-    
+  def insData(records: Seq[ProjectTuple])(implicit sheet: Sheet) {
+    var start = 5
+
+    val sums = for {
+      (projectName, recs) <- records
+    } yield {
+      val end = insProject(projectName, recs, start, records.size > 1)
+      start = end + 1
+
+      end
+    }
+
+    if (records.size > 1) {
+      val formula = sums.map(n => s"C${n + 1}").mkString(" + ")
+      cell(64, 2).cellFormula(formula)
+    }
+  }
+
+  def insProject(projectName: String, recs: Seq[HourTuple], start: Int, insSum: Boolean)(implicit sheet: Sheet): Int = {
+    val shift = start + 1
+    val end = shift + recs.size
+
+    cell(start, 0).cellValue(projectName).cellFont(arial10b)
+
     for {
       idx <- 0 until recs.size
-      rownum = 5 + idx
+      rownum = shift + idx
       (txt, hour) = recs(idx)
     } {
       cell(rownum, 1).cellValue(txt)
       cell(rownum, 2).cellValue(hour)
     }
 
+    if (insSum) {
+    	cell(end, 0).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
+    	cell(end, 1).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
+    	cell(end, 2).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
+    		.cellFormula(s"SUM(C${start - 1}:C${end - 1})").cellFont(arial10b)
+    }
+
+    end
   }
 
   def prepare(username: String, date: DateTime)(implicit sheet: Sheet) {

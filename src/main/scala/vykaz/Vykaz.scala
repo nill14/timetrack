@@ -12,6 +12,9 @@ import org.scala_tools.time.Imports._
 import Implicits._
 
 class Vykaz(xls: String, sheetName: String) {
+  
+  
+  println(s"Vykaz: $xls")
 
   def readProject(prjName: String): Seq[(String, Double)] = {
     // create a new file
@@ -19,8 +22,6 @@ class Vykaz(xls: String, sheetName: String) {
 
     // create a new workbook
     val wb: Workbook = WorkbookFactory.create(inp)
-
-    println(s"Vykaz: $xls")
     
     // create a new sheet
     val sheet = wb.getSheet(sheetName)
