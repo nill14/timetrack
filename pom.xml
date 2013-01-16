@@ -46,25 +46,8 @@
 			<artifactId>scala-library</artifactId>
 			<version>2.10.0</version>
 		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
 
 
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback</artifactId>
-			<version>0.5</version>
-			<type>pom</type>
-			<scope>runtime</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -80,6 +63,7 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-examples</artifactId>
 			<version>3.9</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -118,9 +102,10 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
+					<descriptor>src/assemble/dist-assembly.xml</descriptor>
+<!-- 					<descriptorRefs> -->
+<!-- 						<descriptorRef>jar-with-dependencies</descriptorRef> -->
+<!-- 					</descriptorRefs> -->
           <archive>
             <manifest>
               <mainClass>vykaz.Runner</mainClass>
@@ -135,7 +120,7 @@
               <goal>single</goal>
             </goals>
           </execution>
-        </executions>				
+        </executions>		
 			</plugin>
 		</plugins>
 	</build>

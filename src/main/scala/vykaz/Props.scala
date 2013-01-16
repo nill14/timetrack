@@ -6,7 +6,7 @@ import java.io.FileInputStream
 object Props extends Properties {
 
   //the base folder is ./, the root of the main.properties file  
-  val path = "./vykaz.properties"
+  val path = "./timetrack.properties"
 
   //load the file handle for main.properties
   val file = new FileInputStream(path);
