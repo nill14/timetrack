@@ -3,18 +3,19 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.timetrack</groupId>
 	<artifactId>timetrack</artifactId>
+	<name>Timesheet tracking</name>
 	<packaging>jar</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<repositories>
-    <repository>
-      <id>central</id>
-      <name>Maven Repository Switchboard</name>
-      <layout>default</layout>
-      <url>http://repo1.maven.org/maven2</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>	
+		<repository>
+			<id>central</id>
+			<name>Maven Repository Switchboard</name>
+			<layout>default</layout>
+			<url>http://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 		<repository>
 			<id>scala-tools.org</id>
 			<name>Scala-tools Maven2 Repository</name>
@@ -99,30 +100,40 @@
 					</jvmArgs>
 				</configuration>
 			</plugin>
+			
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>dist-assembly</id> 
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<descriptor>src/assemble/dist-assembly.xml</descriptor>
-<!-- 					<descriptorRefs> -->
-<!-- 						<descriptorRef>jar-with-dependencies</descriptorRef> -->
-<!-- 					</descriptorRefs> -->
-          <archive>
-            <manifest>
-              <mainClass>vykaz.Runner</mainClass>
-            </manifest>
-          </archive>					
+					<archive>
+						<manifest>
+							<mainClass>vykaz.Runner</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id> <!-- this is used for inheritance merges -->
-            <phase>package</phase> <!-- bind to the packaging phase -->
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>		
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.2</version>
+				<configuration>
+					<generateReports>false</generateReports>
+					<generateProjectInfo>false</generateProjectInfo>
+				</configuration>
+			</plugin>
+			
 		</plugins>
 	</build>
-	<name>Timesheet tracking</name>
+
+
 </project>

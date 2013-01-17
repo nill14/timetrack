@@ -1,12 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>me.timetrack</groupId>
+	<artifactId>timetrack-deploy</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<properties>
-		<deployDir>C:/bin</deployDir>
+		<maven.site.skip>true</maven.site.skip>
 	</properties>
-	
+
 	<build>
 		<plugins>
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -14,7 +19,7 @@
 				<executions>
 					<execution>
 						<id>copy</id>
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>copy</goal>
 						</goals>
@@ -26,7 +31,7 @@
 									<type>jar</type>
 									<classifier>dist</classifier>
 									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.directory}</outputDirectory>
+									<outputDirectory>${project.build.directory}/site</outputDirectory>
 									<destFileName>timetrack.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
@@ -37,6 +42,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.6</version>
@@ -44,48 +50,29 @@
 					<execution>
 						<id>copy-resources</id>
 						<!-- here the phase you need -->
-						<phase>package</phase>
+						<phase>site</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}</outputDirectory>
+							<outputDirectory>${project.build.directory}/site</outputDirectory>
 							<resources>
 								<resource>
 									<directory>.</directory>
 									<includes>
-										<include>vykaz.properties</include>
+										<include>timetrack.properties</include>
 									</includes>
 									<filtering>false</filtering>
 								</resource>
 							</resources>
 						</configuration>
 					</execution>
-					
-					<execution>
-						<id>deploy-resources</id>
-						<!-- here the phase you need -->
-						<phase>install</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${deployDir}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.build.directory}</directory>
-									<filtering>false</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>					
 				</executions>
 			</plugin>
+			
 		</plugins>
 	</build>
-	<groupId>me.timetrack</groupId>
-	<artifactId>timetrack-deploy</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+
 	<dependencies>
 		<dependency>
 			<groupId>me.timetrack</groupId>
@@ -93,5 +80,12 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	<packaging>pom</packaging>
+
+	<distributionManagement>
+		<site>
+			<id>timetrack-site</id>
+			<url>file:///C:/bin</url>
+		</site>
+	</distributionManagement>
+
 </project>

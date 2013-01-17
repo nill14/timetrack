@@ -115,7 +115,7 @@ object Implicits {
       val style = cloneAndSetStyle
       style.setFillForegroundColor(color)
       style.setFillBackgroundColor(color)
-      style.setFillPattern(CellStyle.SOLID_FOREGROUND);
+      style.setFillPattern(CellStyle.SOLID_FOREGROUND)
       this
     }
     

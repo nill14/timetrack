@@ -1,6 +1,5 @@
-/vykaz.properties
-/target
-/bin
+target/
+bin/
 /.cache
 /TB-*.xls
 /timetrack.properties
