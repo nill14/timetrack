@@ -6,6 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<properties>
+		<siteUrl>file:///C:/bin</siteUrl>
 		<maven.site.skip>true</maven.site.skip>
 	</properties>
 
@@ -49,7 +50,6 @@
 				<executions>
 					<execution>
 						<id>copy-resources</id>
-						<!-- here the phase you need -->
 						<phase>site</phase>
 						<goals>
 							<goal>copy-resources</goal>
@@ -58,7 +58,7 @@
 							<outputDirectory>${project.build.directory}/site</outputDirectory>
 							<resources>
 								<resource>
-									<directory>.</directory>
+									<directory>${basedir}</directory>
 									<includes>
 										<include>timetrack.properties</include>
 									</includes>
@@ -84,7 +84,7 @@
 	<distributionManagement>
 		<site>
 			<id>timetrack-site</id>
-			<url>file:///C:/bin</url>
+			<url>${siteUrl}</url>
 		</site>
 	</distributionManagement>
 
