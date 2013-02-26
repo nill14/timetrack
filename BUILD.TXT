@@ -1,0 +1,2 @@
+ /c/bin/mvn clean install
+ /c/bin/mvn -f deploy/pom.xml -DsiteUrl=file:///C:/bin -DskipProperties=true clean site-deploy

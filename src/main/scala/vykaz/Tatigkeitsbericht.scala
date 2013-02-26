@@ -18,9 +18,6 @@ import scala.collection.Seq
 
 class Tatigkeitsbericht(xls: String) {
 
-  type HourTuple = (String, Double)
-  type ProjectTuple = (String, Seq[HourTuple])
-  type ProjectLineTuple = (Int, String, Seq[HourTuple])
 
   println(s"TB: $xls")
 
@@ -43,6 +40,14 @@ class Tatigkeitsbericht(xls: String) {
     f.setBoldweight(Font.BOLDWEIGHT_BOLD)
     f
   }
+  
+  lazy val arial10i = {
+    val f = wb.createFont
+    f.setFontHeightInPoints(10)
+    f.setFontName("Arial")
+    f.setItalic(true)
+    f
+  }  
 
   lazy val arial12b = {
     val f = wb.createFont
@@ -100,9 +105,9 @@ class Tatigkeitsbericht(xls: String) {
     var start = 5
 
     val sums = for {
-      (projectName, recs) <- records
+      (projectName, projectCmt, recs) <- records
     } yield {
-      val (header, footer) = insProject(projectName, recs, start, records.size > 1)
+      val (header, footer) = insProject(projectName, projectCmt, recs, start, records.size > 1)
       start = footer + 1
 
       footer
@@ -114,11 +119,12 @@ class Tatigkeitsbericht(xls: String) {
     }
   }
 
-  def insProject(projectName: String, recs: Seq[HourTuple], start: Int, insSum: Boolean)(implicit sheet: Sheet): (Int, Int) = {
+  def insProject(projectName: String, projectCmt: String, recs: Seq[HourTuple], start: Int, insSum: Boolean)(implicit sheet: Sheet): (Int, Int) = {
     val shift = start + 1
     val end = shift + recs.size
 
-    cell(start, 0).cellValue(projectName).cellFont(arial10b)
+    cell(start, 0).cellValue(projectName).cellFont(arial10b).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
+    cell(start, 1).cellValue(projectCmt).cellFont(arial10i).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
 
     for {
       idx <- 0 until recs.size
@@ -130,7 +136,7 @@ class Tatigkeitsbericht(xls: String) {
     }
 
     if (insSum) {
-    	cell(end, 0).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
+    	//cell(end, 0).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
     	cell(end, 1).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
     	cell(end, 2).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
     		.cellFormula(s"SUM(C${shift+1}:C${end})").cellFont(arial10b)
@@ -190,13 +196,6 @@ class Tatigkeitsbericht(xls: String) {
     } {
       c.dataFormat("0.00")
     }
-  }
-
-  def cell(rownum: Int, colnum: Int)(implicit sheet: Sheet): RichCell = {
-    val row = Option(sheet getRow rownum) getOrElse (sheet createRow rownum)
-    val cell = Option(row getCell colnum) getOrElse (row createCell colnum)
-
-    new RichCell(cell)
   }
 
   def makeBorder(regionRef: String, borderStyle: Short)(implicit sheet: Sheet) {

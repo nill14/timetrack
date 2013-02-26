@@ -16,7 +16,7 @@ class Vykaz(xls: String, sheetName: String) {
   
   println(s"Vykaz: $xls")
 
-  def readProject(prjName: String): Seq[(String, Double)] = {
+  def readProject(prjName: String): Seq[ProjectTuple] = {
     // create a new file
     val inp = new FileInputStream(xls)
 
@@ -36,7 +36,7 @@ class Vykaz(xls: String, sheetName: String) {
     //	  }
     //	}
 
-    val comments = collectComments(sheet)(prjName)
+    val comments = collectComments(prjName)(sheet)
 
     // write the workbook to the output stream
     // close our file (don't blow out our file handles
@@ -53,13 +53,24 @@ class Vykaz(xls: String, sheetName: String) {
     row
   }
 
-  private def collectComments(sheet: Sheet)(colHeader: String): Seq[(String, Double)] = {
-    val colIdx = colIndex(sheet)(colHeader)
+  private def collectComments(colHeader: String)(implicit sheet: Sheet): Seq[ProjectTuple] = {
+    
+    for {
+      colIdx <- colIndexes(colHeader)
+      projectCmt = cell(0, colIdx).comment getOrElse("")
+      comments = collectRowComments(colIdx)
+      if !comments.isEmpty
+    } yield {
+    	(colHeader, projectCmt, comments)	
+    }
 
+  }
+  
+  private def collectRowComments(colIdx: Int)(implicit sheet: Sheet): Seq[HourTuple] = {
     val fmt = DateTimeFormat.forPattern("yyyy-MM-dd")
     
     for {
-      cell <- cellRange(sheet)(colIdx)
+    	cell <- cellRange(sheet)(colIdx)
     } yield {
       val hours = cell.getNumericCellValue
 
@@ -70,7 +81,7 @@ class Vykaz(xls: String, sheetName: String) {
     }
   }
 
-  private def colIndex(sheet: Sheet)(header: String): Int = {
+  private def colIndexes(header: String)(implicit sheet: Sheet): Seq[Int] = {
     val row = sheet.getRow(0)
 
     val result = for {
@@ -81,7 +92,7 @@ class Vykaz(xls: String, sheetName: String) {
 
     if (result.isEmpty) throw new Error(s"Sheet ${sheet.getSheetName} does not contain header ${header}")
     
-    result.head
+    result
   }
 
   def cellRange(sheet: Sheet)(colIndex: Int): Seq[Cell] = {

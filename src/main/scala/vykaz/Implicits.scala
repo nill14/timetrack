@@ -4,9 +4,21 @@ import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellStyle
 import org.joda.time.DateTime
 import org.apache.poi.ss.usermodel.Font
+import org.apache.poi.ss.usermodel.Sheet
 
 object Implicits {
+  
+  type HourTuple = (String, Double) //comment, time
+  type ProjectTuple = (String, String, Seq[HourTuple]) //projectName, ProjectCmt, HourTuples
+//  type ProjectLineTuple = (Int, String, Seq[HourTuple])
 
+  def cell(rownum: Int, colnum: Int)(implicit sheet: Sheet): RichCell = {
+    val row = Option(sheet getRow rownum) getOrElse (sheet createRow rownum)
+    val cell = Option(row getCell colnum) getOrElse (row createCell colnum)
+
+    new RichCell(cell)
+  }
+  
   implicit def Cell2RichCell(cell: Cell) = new RichCell(cell)
   
     class RichCell(val cell: Cell) {

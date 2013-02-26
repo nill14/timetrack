@@ -35,10 +35,11 @@ object Runner {
     
     val records = for {
       projectName <- projectNames
+      (_, projectCmt, recs) <- vykaz.readProject(projectName)
     } yield {
-    	val recs = vykaz.readProject(projectName)
+    	println (s"Project ${projectName}, comment ${projectCmt}")
     	recs foreach println
-      (projectName, recs)
+      (projectName, projectCmt, recs)
     }
 
     
