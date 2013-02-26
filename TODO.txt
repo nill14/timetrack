@@ -1,0 +1,2 @@
+add help parameter -? --help
+Overwrite of TB is done automatically - use parameter -f --force-overwrite

@@ -8,11 +8,12 @@
 	<properties>
 		<siteUrl>file:///C:/bin</siteUrl>
 		<maven.site.skip>true</maven.site.skip>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<build>
 		<plugins>
-		
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -43,14 +44,13 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.6</version>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
-						<phase>site</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -69,9 +69,33 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>copy-properties</id>
+			<activation>
+				<property>
+					<name>!skipProperties</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-resources-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-resources</id>
+								<phase>site</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>

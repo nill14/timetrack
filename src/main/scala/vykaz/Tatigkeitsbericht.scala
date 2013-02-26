@@ -102,10 +102,10 @@ class Tatigkeitsbericht(xls: String) {
     val sums = for {
       (projectName, recs) <- records
     } yield {
-      val end = insProject(projectName, recs, start, records.size > 1)
-      start = end + 1
+      val (header, footer) = insProject(projectName, recs, start, records.size > 1)
+      start = footer + 1
 
-      end
+      footer
     }
 
     if (records.size > 1) {
@@ -114,7 +114,7 @@ class Tatigkeitsbericht(xls: String) {
     }
   }
 
-  def insProject(projectName: String, recs: Seq[HourTuple], start: Int, insSum: Boolean)(implicit sheet: Sheet): Int = {
+  def insProject(projectName: String, recs: Seq[HourTuple], start: Int, insSum: Boolean)(implicit sheet: Sheet): (Int, Int) = {
     val shift = start + 1
     val end = shift + recs.size
 
@@ -133,10 +133,10 @@ class Tatigkeitsbericht(xls: String) {
     	cell(end, 0).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
     	cell(end, 1).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
     	cell(end, 2).bgColor(HSSFColor.LIGHT_TURQUOISE.index)
-    		.cellFormula(s"SUM(C${start - 1}:C${end - 1})").cellFont(arial10b)
+    		.cellFormula(s"SUM(C${shift+1}:C${end})").cellFont(arial10b)
     }
 
-    end
+    (start, end)
   }
 
   def prepare(username: String, date: DateTime)(implicit sheet: Sheet) {
